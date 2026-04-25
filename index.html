@@ -43,6 +43,9 @@ html, body {
   flex-direction: column;
   height: 100dvh;
   height: 100vh;
+  max-height: 100dvh;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* HEADER */
@@ -51,6 +54,9 @@ html, body {
   padding: 14px 16px 0;
   padding-top: calc(14px + env(safe-area-inset-top, 0px));
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .header-top {
