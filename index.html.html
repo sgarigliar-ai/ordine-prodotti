@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a3d2b">
+<title>Ordine Frutta e Verdura</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:  #1a3d2b;
+  --green:       #2d6a4f;
+  --green-mid:   #40916c;
+  --green-light: #74c69d;
+  --green-pale:  #d8f3dc;
+  --green-bg:    #f0faf3;
+  --amber:       #e07b39;
+  --bg:          #f4f6f4;
+  --card:        #ffffff;
+  --text:        #111b14;
+  --muted:       #6b7a6e;
+  --border:      #dde8de;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overflow-x: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh;
+}
+
+/* HEADER */
+.app-header {
+  background: var(--green-dark);
+  padding: 14px 16px 0;
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  flex-shrink: 0;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.app-title {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.reset-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  border-radius: 999px;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 7px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.reset-btn:active { opacity: 0.7; }
+
+.cart-btn {  background: var(--amber);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.cart-btn:active { opacity: 0.8; }
+
+.cart-count {
+  background: rgba(255,255,255,0.28);
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 0 4px;
+}
+
+.search-bar {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 11px 14px;
+  width: 100%;
+  outline: none;
+  margin-bottom: 12px;
+  -webkit-appearance: none;
+}
+.search-bar::placeholder { color: rgba(255,255,255,0.45); }
+.search-bar:focus { background: rgba(255,255,255,0.18); }
+
+.cat-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 12px;
+}
+.cat-scroll::-webkit-scrollbar { display: none; }
+
+.cat-pill {
+  background: rgba(255,255,255,0.12);
+  border: none;
+  border-radius: 999px;
+  color: rgba(255,255,255,0.65);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 7px 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cat-pill.active { background: #fff; color: var(--green-dark); }
+.cat-pill:active { opacity: 0.7; }
+
+/* SCROLL AREA */
+.content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 8px 10px calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 16px 4px 6px;
+}
+
+/* PRODUCT CARD */
+.product-card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+}
+.product-card.active {
+  border-color: var(--green-light);
+  background: var(--green-bg);
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  padding: 13px 14px;
+  gap: 11px;
+  cursor: pointer;
+  user-select: none;
+  min-height: 60px;
+}
+
+.product-icon {
+  font-size: 1.25rem;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-pale);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.product-card.active .product-icon { background: rgba(116,198,157,0.35); }
+
+.product-info { flex: 1; min-width: 0; }
+.product-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.product-summary {
+  font-size: 0.72rem;
+  color: var(--green-mid);
+  font-weight: 700;
+  margin-top: 2px;
+  min-height: 13px;
+}
+
+.expand-icon {
+  font-size: 1rem;
+  color: var(--muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.product-card.open .expand-icon { transform: rotate(180deg); }
+
+/* QTY PANEL — vertical rows, one per unit */
+.qty-panel {
+  display: none;
+  flex-direction: column;
+  padding: 4px 10px 12px;
+  gap: 7px;
+}
+.product-card.open .qty-panel { display: flex; }
+
+.qty-block {
+  background: var(--bg);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  transition: border-color 0.15s, background 0.15s;
+}
+.qty-block.has-val {
+  border-color: var(--green-mid);
+  background: var(--green-pale);
+}
+
+.qty-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  width: 42px;
+  text-align: center;
+  flex-shrink: 0;
+  padding: 0 2px;
+}
+.qty-block.has-val .qty-label { color: var(--green); }
+
+.stepper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border-left: 1.5px solid var(--border);
+  min-width: 0;
+}
+.qty-block.has-val .stepper { border-left-color: var(--green-mid); }
+
+.step-btn {
+  width: 44px;
+  height: 46px;
+  border: none;
+  background: transparent;
+  color: var(--green);
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.step-btn:active { background: rgba(45,106,79,0.1); }
+
+.step-val {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  border: none;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  -moz-appearance: textfield;
+  min-width: 0;
+  padding: 0;
+  height: 46px;
+}
+.step-val::-webkit-outer-spin-button,
+.step-val::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+/* BOTTOM BAR */
+.bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1.5px solid var(--border);
+  padding: 10px 12px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 8px;
+  z-index: 20;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.07);
+}
+
+.name-input {
+  flex: 1;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0 14px;
+  height: 50px;
+  outline: none;
+  color: var(--text);
+  -webkit-appearance: none;
+}
+.name-input:focus { border-color: var(--green-light); }
+.name-input::placeholder { color: var(--muted); font-weight: 600; }
+
+.send-btn {
+  background: var(--green);
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  height: 50px;
+  padding: 0 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.send-btn:active { background: var(--green-dark); transform: scale(0.97); }
+
+/* SHEET */
+.sheet-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 50;
+  align-items: flex-end;
+}
+.sheet-overlay.open { display: flex; }
+
+.sheet {
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-height: 78dvh;
+  max-height: 78vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: slideUp 0.22s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 999px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-title { font-size: 1rem; font-weight: 900; color: var(--green-dark); }
+.close-btn {
+  width: 32px; height: 32px;
+  border: none; background: var(--bg);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+}
+
+.sheet-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  padding: 8px 16px 20px;
+}
+
+.cart-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.cart-row-name { font-size: 0.88rem; font-weight: 700; text-transform: capitalize; flex: 1; }
+.cart-row-qty  { font-size: 0.8rem; font-weight: 700; color: var(--green-mid); text-align: right; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.empty-icon { font-size: 2.5rem; display: block; margin-bottom: 8px; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--green-dark);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="app-header">
+    <div class="header-top">
+      <div class="app-title">🌿 Il mio ordine</div>
+      <div style="display:flex;gap:7px;align-items:center;">
+        <button class="reset-btn" onclick="confirmReset()">🗑 Reset</button>
+        <button class="cart-btn" onclick="openSheet()">
+          🛒 Riepilogo <span class="cart-count" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+    <input class="search-bar" type="search" id="searchInput"
+      placeholder="🔍  Cerca prodotto…"
+      oninput="onSearch()" autocomplete="off" autocorrect="off" spellcheck="false">
+    <div class="cat-scroll" id="catScroll"></div>
+  </div>
+
+  <div class="content-scroll" id="contentScroll"></div>
+
+  <div class="bottom-bar">
+    <input class="name-input" type="text" id="clientName"
+      placeholder="Il tuo nome" autocomplete="name">
+    <button class="send-btn" onclick="sendOrder()">Invia 📲</button>
+  </div>
+
+</div>
+
+<!-- Sheet -->
+<div class="sheet-overlay" id="sheetOverlay" onclick="closeSheetOutside(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <span class="sheet-title">Riepilogo ordine</span>
+      <button class="close-btn" onclick="closeSheet()">✕</button>
+    </div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATEGORIES = {
+  "🥬 Verdure": [
+    "agretti","asparagi","asparagi nostrali","baccelli","barbe rosse","bietola","broccoli",
+    "carciofi","carote","carote a mazzo","cavolo nero","cavolfiore","cavolo cuore","cavolo verza",
+    "cetrioli","cicoria","cime di rape","crauto bianco","crauto rosso","fagiolini","finocchi",
+    "melanzane lunghe","melanzane striate","melanzane tonde","melanzane viola",
+    "pak choi","patate","patate americane/viola","patate francesi","patate lavate",
+    "patate nuove","patate rosse","peperoni gialli","peperoni rossi","piselli","porri",
+    "puntarelle","radicchio chioggia","radicchio trevisano","ravanelli","rucola a mazzi",
+    "sedano","sedano rapa","spinaci","spinaci busta","topinambur","zucca muscat",
+    "zucchine fiore","zucchine senza fiore"
+  ],
+  "🍅 Pomodori": [
+    "pomodori acerbi tondi","pomodoro camone","pomodoro costoluto","pomodori cuore di bue",
+    "pomodori ciliegino","pomodori daniela","pomodori datterino giallo","pomodori datterino",
+    "pomodori maturi grappolo","pomodori maturi spagna","pomodori oblungo acerbo","pomodori piccadilly"
+  ],
+  "🥗 Insalate": [
+    "insalata belga","insalata gentilina","insalata iceberg","insalata lattuga",
+    "insalata misticanza","insalata riccia","insalata romana","insalata scarola","sakura mix"
+  ],
+  "🍊 Frutta": [
+    "ananas","arance navel","arance navel foglia","arance tarocco cal. 9","avocado hass",
+    "banane","clementine","fragole Candonga","kiwi zespri","kiwi italia",
+    "lamponi vaschetta","lime","limoni","mango","mirtilli vaschetta","more vaschetta",
+    "mele Ambrosia","mele Annurca","mele deliziose Melinda","mele fuji",
+    "mele golden Melasi","mele golden Melinda","mele pink lady","mele renette","mele smith",
+    "meloni","nespole","noci","passion fruit","pere abate","pere cosce","pere decana",
+    "pere williams","pesche","pompelmi rosa","ribes vaschetta"
+  ],
+  "🧅 Cipolle": [
+    "aglio","cipolle bianche","cipolle bionde","cipolle borrettane pelate","cipolle rosse",
+    "cipolline fresche bianche","cipolle fresche Tropea","scalogno"
+  ],
+  "🌿 Aromi": [
+    "alloro 20gr","basilico","basilico 20gr","basilico pianta","erba cipollina 20gr",
+    "finocchietto 20gr","maggiorana 20gr","menta 500gr","prezzemolo","rosmarino",
+    "rosmarino 200gr","salvia","salvia 200gr","timo 20gr","zenzero sfuso"
+  ],
+  "🌸 Fiori": ["fiori eduli","fiori zucchine"],
+  "🍄 Funghi": ["funghi champignon"]
+};
+
+const UNIT_LABELS = { cassette:"Cass.", pezzi:"Pz.", kg:"Kg" };
+const STEPS = { cassette:1, pezzi:1, kg:0.5 };
+
+const qty = {};
+let currentCat = 'Tutti';
+let searchVal = '';
+let openCard = null;
+
+function getQty(key) {
+  if (!qty[key]) qty[key] = {cassette:0, pezzi:0, kg:0};
+  return qty[key];
+}
+function hasAny(key) {
+  const q = qty[key];
+  return q && (q.cassette>0 || q.pezzi>0 || q.kg>0);
+}
+function summarize(key) {
+  const q = qty[key]; if(!q) return '';
+  const p=[];
+  if(q.cassette>0) p.push(fmt(q.cassette)+' cass.');
+  if(q.pezzi>0)    p.push(fmt(q.pezzi)+' pz.');
+  if(q.kg>0)       p.push(fmt(q.kg)+' kg');
+  return p.join(' · ');
+}
+function fmt(n){ return Number.isInteger(n)?n:parseFloat(n.toFixed(2)); }
+function safeId(str){ return str.replace(/[^a-zA-Z0-9]/g,'_'); }
+function safeAttr(str){ return str.replace(/'/g,"\\'"); }
+
+// Build tabs
+function buildCatTabs(){
+  const cats=['Tutti',...Object.keys(CATEGORIES)];
+  document.getElementById('catScroll').innerHTML=cats.map(c=>
+    `<button class="cat-pill${c==='Tutti'?' active':''}" onclick="selectCat('${safeAttr(c)}',this)">${c}</button>`
+  ).join('');
+}
+
+function selectCat(cat,btn){
+  currentCat=cat;
+  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  openCard=null;
+  render();
+  document.getElementById('contentScroll').scrollTop=0;
+}
+
+function onSearch(){
+  searchVal=document.getElementById('searchInput').value.toLowerCase().trim();
+  openCard=null;
+  render();
+}
+
+function render(){
+  const cats=currentCat==='Tutti'?Object.keys(CATEGORIES):[currentCat];
+  let html='';
+  cats.forEach(cat=>{
+    const products=CATEGORIES[cat].filter(p=>!searchVal||p.toLowerCase().includes(searchVal));
+    if(!products.length) return;
+    if(currentCat==='Tutti') html+=`<div class="section-label">${cat}</div>`;
+    products.forEach(p=>{
+      const key=p;
+      const id=safeId(key);
+      const active=hasAny(key);
+      const isOpen=openCard===key;
+      const q=getQty(key);
+      html+=`
+      <div class="product-card${active?' active':''}${isOpen?' open':''}" id="card-${id}">
+        <div class="card-row" onclick="toggleCard('${safeAttr(key)}')">
+          <div class="product-icon">${catEmoji(cat)}</div>
+          <div class="product-info">
+            <div class="product-name">${p}</div>
+            <div class="product-summary">${summarize(key)}</div>
+          </div>
+          <div class="expand-icon">⌄</div>
+        </div>
+        ${isOpen?`
+        <div class="qty-panel">
+          ${['cassette','pezzi','kg'].map(type=>{
+            const v=q[type]||0; const hv=v>0;
+            return `
+            <div class="qty-block${hv?' has-val':''}" id="blk-${id}-${type}">
+              <div class="qty-label">${UNIT_LABELS[type]}</div>
+              <div class="stepper">
+                <button class="step-btn" onclick="step('${safeAttr(key)}','${type}',-1)">−</button>
+                <input class="step-val" type="number" inputmode="decimal"
+                  value="${v>0?fmt(v):''}" placeholder="0"
+                  oninput="setVal('${safeAttr(key)}','${type}',this.value)"
+                  id="inp-${id}-${type}">
+                <button class="step-btn" onclick="step('${safeAttr(key)}','${type}',1)">+</button>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>`:''}
+      </div>`;
+    });
+  });
+  if(!html) html='<div class="empty-state"><span class="empty-icon">🔍</span>Nessun prodotto trovato</div>';
+  document.getElementById('contentScroll').innerHTML=html;
+  updateCartCount();
+}
+
+function catEmoji(cat){
+  return cat.split(' ')[0]||'🌿';
+}
+
+function toggleCard(key){
+  openCard=openCard===key?null:key;
+  render();
+  if(openCard){
+    setTimeout(()=>{
+      const el=document.getElementById('card-'+safeId(key));
+      if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+    },60);
+  }
+}
+
+function step(key,type,dir){
+  const q=getQty(key);
+  let v=Math.round(((q[type]||0)+dir*STEPS[type])*100)/100;
+  if(v<0) v=0;
+  q[type]=v;
+  const id=safeId(key);
+  const inp=document.getElementById('inp-'+id+'-'+type);
+  if(inp) inp.value=v>0?fmt(v):'';
+  const blk=document.getElementById('blk-'+id+'-'+type);
+  if(blk) blk.classList.toggle('has-val',v>0);
+  const sumEl=document.querySelector('#card-'+id+' .product-summary');
+  if(sumEl) sumEl.textContent=summarize(key);
+  const card=document.getElementById('card-'+id);
+  if(card) card.classList.toggle('active',hasAny(key));
+  updateCartCount();
+}
+
+function setVal(key,type,raw){
+  const v=parseFloat(raw);
+  const q=getQty(key);
+  q[type]=isNaN(v)||v<0?0:Math.round(v*100)/100;
+  const id=safeId(key);
+  const blk=document.getElementById('blk-'+id+'-'+type);
+  if(blk) blk.classList.toggle('has-val',q[type]>0);
+  const sumEl=document.querySelector('#card-'+id+' .product-summary');
+  if(sumEl) sumEl.textContent=summarize(key);
+  const card=document.getElementById('card-'+id);
+  if(card) card.classList.toggle('active',hasAny(key));
+  updateCartCount();
+}
+
+function updateCartCount(){
+  document.getElementById('cartCount').textContent=
+    Object.keys(qty).filter(k=>hasAny(k)).length;
+}
+
+function openSheet(){
+  const lines=Object.keys(qty).filter(k=>hasAny(k));
+  const body=document.getElementById('sheetBody');
+  body.innerHTML=lines.length
+    ? lines.map(k=>`
+        <div class="cart-row">
+          <span class="cart-row-name">${k}</span>
+          <span class="cart-row-qty">${summarize(k)}</span>
+        </div>`).join('')
+    : '<div class="empty-state"><span class="empty-icon">🛒</span>Nessun prodotto selezionato</div>';
+  document.getElementById('sheetOverlay').classList.add('open');
+}
+function closeSheet(){ document.getElementById('sheetOverlay').classList.remove('open'); }
+function closeSheetOutside(e){ if(e.target.id==='sheetOverlay') closeSheet(); }
+
+function confirmReset(){
+  if(!Object.keys(qty).some(k=>hasAny(k))){ showToast('Nessun ordine da cancellare'); return; }
+  if(confirm('Cancellare tutte le quantità inserite?')) resetOrder();
+}
+
+function resetOrder(){
+  Object.keys(qty).forEach(k=>{ qty[k]={cassette:0,pezzi:0,kg:0}; });
+  document.getElementById('clientName').value='';
+  openCard=null;
+  render();
+  showToast('✅ Ordine azzerato');
+}
+
+
+function sendOrder(){
+  const name=document.getElementById('clientName').value.trim();
+  const lines=Object.keys(qty).filter(k=>hasAny(k));
+  if(!name)        { showToast('⚠️ Inserisci il tuo nome'); return; }
+  if(!lines.length){ showToast('⚠️ Seleziona almeno un prodotto'); return; }
+  let msg=`🌿 *Ordine di ${name}*\n\n`;
+  lines.forEach(k=>{ msg+=`• ${k}: ${summarize(k)}\n`; });
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  showToast('✅ Ordine inviato!');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+buildCatTabs();
+render();
+</script>
+</body>
+</html>
