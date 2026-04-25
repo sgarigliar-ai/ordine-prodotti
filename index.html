@@ -54,8 +54,10 @@ html, body {
   padding: 14px 16px 0;
   padding-top: calc(14px + env(safe-area-inset-top, 0px));
   flex-shrink: 0;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
 }
 
@@ -601,6 +603,8 @@ function selectCat(cat,btn){
   currentCat=cat;
   document.querySelectorAll('.cat-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  searchVal='';
+  document.getElementById('searchInput').value='';
   openCard=null;
   render();
   document.getElementById('contentScroll').scrollTop=0;
@@ -761,6 +765,16 @@ function showToast(msg){
 
 buildCatTabs();
 render();
+
+// Fix altezza reale su Android/Chrome (la barra URL cambia l'altezza)
+function fixHeight() {
+  const h = window.innerHeight;
+  document.getElementById('app').style.height = h + 'px';
+  const headerH = document.querySelector('.app-header').offsetHeight;
+  document.getElementById('contentScroll').style.paddingTop = (headerH + 8) + 'px';
+}
+fixHeight();
+window.addEventListener('resize', fixHeight);
 </script>
 </body>
 </html>
